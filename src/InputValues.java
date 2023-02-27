@@ -28,9 +28,9 @@ public class InputValues {
     public static int scanDay(int year, int month) throws IncorrectArgumentException {
         try {
             int maxDaysInMonth = LocalDate.of(year, month, 1).lengthOfMonth();
-            return scanInt(1, maxDaysInMonth, "month (0 for exit)");
+            return scanInt(1, maxDaysInMonth, "day (0 for exit)");
         } catch (Exception e) {
-            throw new IncorrectArgumentException("Month number incorrect");
+            throw new IncorrectArgumentException("Day number incorrect");
         }
     }
 
