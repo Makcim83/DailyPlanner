@@ -78,8 +78,6 @@ public class TaskService {
                 break;
             }
         }
-
-
         return menuNumber;
     }
 
@@ -93,17 +91,25 @@ public class TaskService {
         taskSet.forEach(task -> System.out.println(task.toStringWithID()));
         int id = InputValues.scanID("Input ID for delete task (0 for exit)");
         if (id == 0) {
-            System.out.println("Deleted is cancelled");
+            System.out.println("Remove is cancelled");
         } else {
             try {
-                Task taskForRemove = taskSet
+                int taskCounts = (int) taskSet
                         .stream()
                         .filter(t -> t.getId() == id)
-                        .findFirst()
-                        .get();
-                taskSet.remove(taskForRemove);
-                removedTasks.add(taskForRemove);
-                System.out.println("Task ID " + id + " deleted successfully");
+                        .count();
+                if (taskCounts > 0) {
+                    Task taskForRemove = taskSet
+                            .stream()
+                            .filter(t -> t.getId() == id)
+                            .findFirst()
+                            .get();
+                    taskSet.remove(taskForRemove);
+                    removedTasks.add(taskForRemove);
+                    System.out.println("Task ID " + id + " removed successfully");
+                } else {
+                    System.out.println("incorrect ID");
+                }
             } catch (Exception e) {
                 throw new TaskNotFoundException("task not found or incorrect ID");
             }
@@ -117,14 +123,22 @@ public class TaskService {
             System.out.println("Restore is cancelled");
         } else {
             try {
-                Task taskForRestore = removedTasks
+                int taskCounts = (int) removedTasks
                         .stream()
                         .filter(t -> t.getId() == id)
-                        .findFirst()
-                        .get();
-                removedTasks.remove(taskForRestore);
-                taskSet.add(taskForRestore);
-                System.out.println("Task ID " + id + " restored successfully");
+                        .count();
+                if (taskCounts > 0) {
+                    Task taskForRestore = removedTasks
+                            .stream()
+                            .filter(t -> t.getId() == id)
+                            .findFirst()
+                            .get();
+                    removedTasks.remove(taskForRestore);
+                    taskSet.add(taskForRestore);
+                    System.out.println("Task ID " + id + " restored successfully");
+                } else {
+                    System.out.println("incorrect ID");
+                }
             } catch (Exception e) {
                 throw new TaskNotFoundException("task not found or incorrect ID");
             }
@@ -133,6 +147,28 @@ public class TaskService {
 
     private static void getAllByDate(int y, int m, int d) {
         System.out.println("Tasks list at date " + y + "-" + m + "-" + d);
-        System.err.println("List....");
+        LocalDate showDate = LocalDate.of(y, m, d);
+        System.err.println("List...." + showDate.toString());
+        for (Task task : taskSet) {
+            LocalDate taskDate = task.getDateTime();
+            if (task.repeatPeriod.repeatD == 1) {
+                System.out.println(task);
+            } else if (task.repeatPeriod.repeatM == 1) {
+                do {
+                    taskDate.plusMonths(1);
+                    if (taskDate == showDate) {
+                        System.out.println(task);
+                    }
+                } while (taskDate.isBefore(showDate));
+            } else if (task.repeatPeriod.repeatY == 1) {
+                do {
+                    taskDate.plusYears(1);
+                    if (taskDate == showDate) {
+                        System.out.println(task);
+                    }
+                } while (taskDate.isBefore(showDate));
+            }
+        }
     }
 }
+

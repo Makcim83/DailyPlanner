@@ -7,7 +7,7 @@ public class InputValues {
 
     public static int scanYear() throws IncorrectArgumentException {
         try {
-            return scanInt(LocalDate.now().getYear(), 3000, "year (0 for exit)");
+            return scanInt(LocalDate.now().getYear(), 3000, "year");
         } catch (Exception e) {
             throw new IncorrectArgumentException("Year number incorrect");
         }
@@ -17,7 +17,7 @@ public class InputValues {
 
     public static int scanMonth() throws IncorrectArgumentException {
         try {
-            return scanInt(1, 12, "month (0 for exit)");
+            return scanInt(1, 12, "month");
         } catch (Exception e) {
             throw new IncorrectArgumentException("Month number incorrect");
         }
@@ -28,7 +28,7 @@ public class InputValues {
     public static int scanDay(int year, int month) throws IncorrectArgumentException {
         try {
             int maxDaysInMonth = LocalDate.of(year, month, 1).lengthOfMonth();
-            return scanInt(1, maxDaysInMonth, "day (0 for exit)");
+            return scanInt(1, maxDaysInMonth, "day");
         } catch (Exception e) {
             throw new IncorrectArgumentException("Day number incorrect");
         }
