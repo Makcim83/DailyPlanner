@@ -1,10 +1,10 @@
 public enum RepeatPeriod {
 
-    YearlyTask(true, false, false, false, 1),
-    MonthlyTask(false, true, false, false, 1),
-    WeeklyTask(false, false, true, false, 1),
-    DailyTask(false, false, false, true, 1),
     OneTimeTask(false, false, false, false, 0),
+    DailyTask(false, false, false, true, 1),
+    WeeklyTask(false, false, true, false, 1),
+    MonthlyTask(false, true, false, false, 1),
+    YearlyTask(true, false, false, false, 1),
     Weekends(false, false, true, false, 2),
     Vocation(false, false, false, false, 14);
 

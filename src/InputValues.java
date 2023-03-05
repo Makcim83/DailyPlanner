@@ -52,7 +52,6 @@ public class InputValues {
         while (true) {
             System.out.println(message);
             while (!scanner.hasNextInt()) {
-                System.out.println("incorrect input, number must be integer");
                 scanner.nextLine();
             }
             int value = scanner.nextInt();
@@ -60,6 +59,16 @@ public class InputValues {
                 return value;
             }
             System.out.println("Enter a number in the range from " + minValue + " to " + maxValue);
+        }
+    }
+
+    public static String scanString(int minLength, int maxLength, String message) {
+        while (true) {
+            System.out.println(message);
+            String str = scanner.nextLine();
+            if (str.isEmpty() && minLength == 0) return "";
+            if (minLength <= str.length() && str.length() <= maxLength) return str;
+            System.out.println("incorrect input, need length " + minLength + ".." + maxLength);
         }
     }
 

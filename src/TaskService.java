@@ -1,4 +1,5 @@
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -46,11 +47,12 @@ public class TaskService {
             }
             case 2: {
                 System.err.println("Selected 2 - add task");
+                addNewTask();
                 break;
             }
             case 3: {
                 System.out.println("Selected 3 - delete task by ID");
-                if (removedTasks.isEmpty()) {
+                if (taskSet.isEmpty()) {
                     System.err.println("no tasks");
                 } else {
                     inputIdForRemove();
@@ -76,9 +78,21 @@ public class TaskService {
         return menuNumber;
     }
 
-    private static void add(Task task) {
+    private static void addNewTask() throws IncorrectArgumentException {
         System.out.println("Task addition ....");
-        System.out.println();
+        Task t;
+        LocalDate date = InputValues.scanDate("Input date of new Task");
+        String tittle = InputValues.scanString(1, 50, "Input tittle (length 1..50)");
+        int typeOfTask = InputValues.scanInt(0, 1, "Task type: 0 - work, 1 - personal");
+        int typeOfRepeat = InputValues.scanInt(0, 7, "Repeat every:  0 - no, 1 - day, 2 - week, 3 - month, 5 - year, 6 - weekends(2d every week), 7 - vocation(14d, no repeat)");
+        String description = InputValues.scanString(0, 250, "Input description (length 0..250)");
+        if (description.isEmpty() || description.isBlank()) {
+            t = new Task(tittle, Task.Type.values()[typeOfTask], date, RepeatPeriod.values()[typeOfRepeat]);
+        } else {
+            t = new Task(tittle, Task.Type.values()[typeOfTask], date, RepeatPeriod.values()[typeOfRepeat], description);
+        }
+        taskSet.add(t);
+        System.out.println("Created new task " + t.toStringWithID());
     }
 
     private static void inputIdForRemove() throws TaskNotFoundException {
@@ -146,7 +160,7 @@ public class TaskService {
             if (dateTemp.isEqual(showDate)) {
                 System.out.println("Today is planned task : " + task);
             } else if (dateTemp.isAfter(showDate)) {
-//                System.out.println("Дата этой задачи еще не наступила, позже" + task);
+//                System.out.println("To early for this task " + task);
             } else if (task.repeatPeriod == RepeatPeriod.DailyTask
                     || (task.repeatPeriod == RepeatPeriod.WeeklyTask && dateTemp.getDayOfWeek() == showDate.getDayOfWeek())
                     || (task.repeatPeriod == RepeatPeriod.Weekends && (dateTemp.getDayOfWeek() == showDate.getDayOfWeek() || dateTemp.plusDays(1).getDayOfWeek() == showDate.getDayOfWeek()))
@@ -162,13 +176,11 @@ public class TaskService {
                         dateTemp = dateTemp.plusYears(1);
                     } else if (task.repeatPeriod == RepeatPeriod.MonthlyTask) {
                         dateTemp = dateTemp.plusMonths(1);
-                    } else if (dateTemp.isAfter(showDate)) {
-                        System.out.println("Дата этой задачи еще не наступила, позже++++" + task);
                     }
-                    ;
-                }
-                if (dateTemp.isEqual(showDate)) {
-                    System.out.println("Today is planned task : " + task);
+                    if (dateTemp.isEqual(showDate)) {
+                        System.out.println("Today is planned task : " + task);
+                        ;
+                    }
                 }
             }
         }
