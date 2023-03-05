@@ -1,4 +1,8 @@
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.Scanner;
 
 public class InputValues {
@@ -56,6 +60,27 @@ public class InputValues {
                 return value;
             }
             System.out.println("Enter a number in the range from " + minValue + " to " + maxValue);
+        }
+    }
+
+    public static LocalDate scanDate(String message) throws IncorrectArgumentException {
+        while (true) {
+            Date dateInput = null;
+            System.out.print(message);
+            System.out.println("Input date in format dd.mm.yyyy");
+            Scanner input = new Scanner(System.in);
+            SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
+            String cinput = input.nextLine();
+            try {
+                if (cinput != null && cinput.trim().length() > 0) {
+                    dateInput = format.parse(cinput);
+                }
+                System.out.println("Input date is : " + dateInput);
+                LocalDate localDate = dateInput.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                return localDate;
+            } catch (ParseException e) {
+                System.err.println("Date must be in format dd.mm.yyyy");
+            }
         }
     }
 }

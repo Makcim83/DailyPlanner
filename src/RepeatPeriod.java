@@ -1,21 +1,20 @@
 public enum RepeatPeriod {
 
-    YearlyTask(1, 0, 0, 0, 1),
-    MonthlyTask(0, 1, 0, 0, 1),
-    WeeklyTask(0, 0, 1, 0, 1),
-    DailyTask(0, 0, 0, 1, 1),
-    OneTimeTask(0, 0, 0, 0, 0),
-    schedule3after3(0, 0, 0, 3, 3),
-    Weekends(0, 0, 1, 0, 2),
-    Vocation(0, 0, 0, 0, 14);
+    YearlyTask(true, false, false, false, 1),
+    MonthlyTask(false, true, false, false, 1),
+    WeeklyTask(false, false, true, false, 1),
+    DailyTask(false, false, false, true, 1),
+    OneTimeTask(false, false, false, false, 0),
+    Weekends(false, false, true, false, 2),
+    Vocation(false, false, false, false, 14);
 
-    protected int repeatY;
-    protected int repeatM;
-    protected int repeatW;
-    protected int repeatD;
+    protected boolean repeatY;
+    protected boolean repeatM;
+    protected boolean repeatW;
+    protected boolean repeatD;
     protected int durationDays;
 
-    RepeatPeriod(int Year, int Month, int Week, int Day, int DurationDays) {
+    RepeatPeriod(boolean Year, boolean Month, boolean Week, boolean Day, int DurationDays) {
         this.repeatY = Year;
         this.repeatM = Month;
         this.repeatW = Week;

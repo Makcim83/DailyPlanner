@@ -74,11 +74,7 @@ public class Task {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
-        return id == task.id
-                && Objects.equals(tittle, task.tittle)
-                && Objects.equals(type, task.type)
-                && Objects.equals(dateTime, task.dateTime)
-                && Objects.equals(description, task.description);
+        return id == task.id;
     }
 
     @Override
@@ -103,6 +99,6 @@ public class Task {
 
     public String toStringWithID() {
         return "ID:" + id + " " +
-                toString();
+                this;
     }
 }

@@ -9,10 +9,12 @@ public class TaskService {
     public static void addTasksForExample() {
         System.out.println("Some Tasks added to Planner (for example):");
         taskSet.add(new Task("New Year!!", Task.Type.personal, LocalDate.of(2023, 01, 01), RepeatPeriod.YearlyTask, "Santa comes soon!"));
-        taskSet.add(new Task("Weekends", Task.Type.personal, LocalDate.of(2023, 01, 04), RepeatPeriod.Weekends, "Some Descriptions for Weekends"));
+        taskSet.add(new Task("Weekends", Task.Type.personal, LocalDate.of(2023, 01, 07), RepeatPeriod.Weekends, "Some Descriptions for Weekends"));
         taskSet.add(new Task("SomeWorkDay", Task.Type.work, LocalDate.of(2023, 02, 28), RepeatPeriod.WeeklyTask));
         taskSet.add(new Task("Happy Birthday", Task.Type.personal, LocalDate.of(2023, 11, 10), RepeatPeriod.YearlyTask, ""));
-        taskSet.add(new Task("Some Work Day 3 after 3", Task.Type.work, LocalDate.of(2023, 02, 28), RepeatPeriod.schedule3after3, "Work time"));
+        taskSet.add(new Task("Vocation", Task.Type.work, LocalDate.of(2023, 02, 28), RepeatPeriod.Vocation, "chill out"));
+        taskSet.add(new Task("EveryDayTask", Task.Type.personal, LocalDate.of(2023, 02, 02), RepeatPeriod.DailyTask, ""));
+        taskSet.add(new Task("EveryMonthTask", Task.Type.personal, LocalDate.of(2023, 03, 01), RepeatPeriod.DailyTask, "03 day of every month"));
         taskSet.forEach(System.out::println);
     }
 
@@ -21,10 +23,8 @@ public class TaskService {
                 "\n1 - show tasks at date" +
                 "\n2 - add task" +
                 "\n3 - delete task" +
-                "\n4 - show list of tasks at date" +
-                "\n5 - add tasks in file" +
-                "\n6 - show all tasks" +
-                "\n7 - restore removed tasks" +
+                "\n4 - show all tasks" +
+                "\n5 - restore removed tasks" +
                 "\n0 - exit planner");
         System.out.println();
     }
@@ -39,6 +39,9 @@ public class TaskService {
             }
             case 1: {
                 System.err.println("Selected 1 - show tasks at date");
+                LocalDate showAtDate = InputValues.scanDate("");
+                System.out.println(showAtDate);
+                showAllAtDate(showAtDate);
                 break;
             }
             case 2: {
@@ -47,28 +50,20 @@ public class TaskService {
             }
             case 3: {
                 System.out.println("Selected 3 - delete task by ID");
-                inputIdForRemove();
+                if (removedTasks.isEmpty()) {
+                    System.err.println("no tasks");
+                } else {
+                    inputIdForRemove();
+                }
                 break;
             }
             case 4: {
-                System.err.println("Selected 4 - show tasks at date");
-                int year = InputValues.scanYear();
-                int month = InputValues.scanMonth();
-                int day = InputValues.scanDay(year, month);
-                getAllByDate(year, month, day);
-                break;
-            }
-            case 5: {
-                System.err.println("Selected 5 - add tasks in file");
-                break;
-            }
-            case 6: {
-                System.out.println("Selected 6 - show all tasks");
+                System.out.println("Selected 4 - show all tasks");
                 taskSet.forEach(System.out::println);
                 break;
             }
-            case 7: {
-                System.out.println("Selected 7 - restore removed tasks by ID");
+            case 5: {
+                System.out.println("Selected 5 - restore removed tasks by ID");
                 if (removedTasks.isEmpty()) {
                     System.err.println("no removed tasks");
                 } else {
@@ -80,7 +75,6 @@ public class TaskService {
         }
         return menuNumber;
     }
-
 
     private static void add(Task task) {
         System.out.println("Task addition ....");
@@ -145,30 +139,40 @@ public class TaskService {
         }
     }
 
-    private static void getAllByDate(int y, int m, int d) {
-        System.out.println("Tasks list at date " + y + "-" + m + "-" + d);
-        LocalDate showDate = LocalDate.of(y, m, d);
-        System.err.println("List...." + showDate.toString());
+    private static void showAllAtDate(LocalDate showDate) {
+        System.out.println("Tasks list at date " + showDate);
         for (Task task : taskSet) {
-            LocalDate taskDate = task.getDateTime();
-            if (task.repeatPeriod.repeatD == 1) {
-                System.out.println(task);
-            } else if (task.repeatPeriod.repeatM == 1) {
-                do {
-                    taskDate.plusMonths(1);
-                    if (taskDate == showDate) {
-                        System.out.println(task);
+            LocalDate dateTemp = task.getDateTime();
+            if (dateTemp.isEqual(showDate)) {
+                System.out.println("Today is planned task : " + task);
+            } else if (dateTemp.isAfter(showDate)) {
+//                System.out.println("Дата этой задачи еще не наступила, позже" + task);
+            } else if (task.repeatPeriod == RepeatPeriod.DailyTask
+                    || (task.repeatPeriod == RepeatPeriod.WeeklyTask && dateTemp.getDayOfWeek() == showDate.getDayOfWeek())
+                    || (task.repeatPeriod == RepeatPeriod.Weekends && (dateTemp.getDayOfWeek() == showDate.getDayOfWeek() || dateTemp.plusDays(1).getDayOfWeek() == showDate.getDayOfWeek()))
+                    || (task.repeatPeriod == RepeatPeriod.Vocation && (dateTemp.isAfter(showDate) && dateTemp.isBefore(showDate.plusDays(RepeatPeriod.Vocation.durationDays))))
+            ) {
+                System.out.println("Today is planned task : " + task);
+            } else if (task.repeatPeriod == RepeatPeriod.YearlyTask
+                    || task.repeatPeriod == RepeatPeriod.MonthlyTask) {
+                while (dateTemp.isAfter(showDate)) {
+                    if (dateTemp.isEqual(showDate)) {
+                        System.out.println("Today is planned task : " + task);
+                    } else if (task.repeatPeriod == RepeatPeriod.YearlyTask) {
+                        dateTemp = dateTemp.plusYears(1);
+                    } else if (task.repeatPeriod == RepeatPeriod.MonthlyTask) {
+                        dateTemp = dateTemp.plusMonths(1);
+                    } else if (dateTemp.isAfter(showDate)) {
+                        System.out.println("Дата этой задачи еще не наступила, позже++++" + task);
                     }
-                } while (taskDate.isBefore(showDate));
-            } else if (task.repeatPeriod.repeatY == 1) {
-                do {
-                    taskDate.plusYears(1);
-                    if (taskDate == showDate) {
-                        System.out.println(task);
-                    }
-                } while (taskDate.isBefore(showDate));
+                    ;
+                }
+                if (dateTemp.isEqual(showDate)) {
+                    System.out.println("Today is planned task : " + task);
+                }
             }
         }
     }
 }
+
 
