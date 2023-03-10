@@ -15,7 +15,7 @@ public class TaskService {
         taskSet.add(new Task("Happy Birthday", Task.Type.personal, LocalDate.of(2023, 11, 10), RepeatPeriod.YearlyTask, ""));
         taskSet.add(new Task("Vocation", Task.Type.work, LocalDate.of(2023, 02, 28), RepeatPeriod.Vocation, "chill out"));
         taskSet.add(new Task("EveryDayTask", Task.Type.personal, LocalDate.of(2023, 02, 02), RepeatPeriod.DailyTask, ""));
-        taskSet.add(new Task("EveryMonthTask", Task.Type.personal, LocalDate.of(2023, 03, 01), RepeatPeriod.DailyTask, "03 day of every month"));
+        taskSet.add(new Task("EveryMonthTask", Task.Type.personal, LocalDate.of(2023, 03, 03), RepeatPeriod.MonthlyTask, "03 day of every month"));
         taskSet.forEach(System.out::println);
     }
 
@@ -153,35 +153,13 @@ public class TaskService {
         }
     }
 
-    private static void showAllAtDate(LocalDate showDate) {
-        System.out.println("Tasks list at date " + showDate);
+    private static void showAllAtDate(LocalDate date) {
+        System.out.println("Tasks list at date " + date);
         for (Task task : taskSet) {
-            LocalDate dateTemp = task.getDateTime();
-            if (dateTemp.isEqual(showDate)) {
-                System.out.println("Today is planned task : " + task);
-            } else if (dateTemp.isAfter(showDate)) {
-//                System.out.println("To early for this task " + task);
-            } else if (task.repeatPeriod == RepeatPeriod.DailyTask
-                    || (task.repeatPeriod == RepeatPeriod.WeeklyTask && dateTemp.getDayOfWeek() == showDate.getDayOfWeek())
-                    || (task.repeatPeriod == RepeatPeriod.Weekends && (dateTemp.getDayOfWeek() == showDate.getDayOfWeek() || dateTemp.plusDays(1).getDayOfWeek() == showDate.getDayOfWeek()))
-                    || (task.repeatPeriod == RepeatPeriod.Vocation && (dateTemp.isAfter(showDate) && dateTemp.isBefore(showDate.plusDays(RepeatPeriod.Vocation.durationDays))))
-            ) {
-                System.out.println("Today is planned task : " + task);
-            } else if (task.repeatPeriod == RepeatPeriod.YearlyTask
-                    || task.repeatPeriod == RepeatPeriod.MonthlyTask) {
-                while (dateTemp.isAfter(showDate)) {
-                    if (dateTemp.isEqual(showDate)) {
-                        System.out.println("Today is planned task : " + task);
-                    } else if (task.repeatPeriod == RepeatPeriod.YearlyTask) {
-                        dateTemp = dateTemp.plusYears(1);
-                    } else if (task.repeatPeriod == RepeatPeriod.MonthlyTask) {
-                        dateTemp = dateTemp.plusMonths(1);
-                    }
-                    if (dateTemp.isEqual(showDate)) {
-                        System.out.println("Today is planned task : " + task);
-                        ;
-                    }
-                }
+            if (RepeatPeriod.isEntry(date, task.getDateTime(), task.repeatPeriod)) {
+                System.out.println("Today is planned task " + task);
+            } else {
+                System.out.println("Today is not planned task " + task);
             }
         }
     }
